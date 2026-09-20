@@ -18,19 +18,24 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
 jobs:
   check-no-binaries:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
 
       - name: Check for binary files in PR
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          git fetch origin ${{ github.base_ref }}
-          BINARIES=$(git diff --numstat --diff-filter=ACM origin/${{ github.base_ref }}...HEAD | awk '$1 == "-" || $2 == "-" {print $3}')
+          git fetch origin "$BASE_REF"
+          BINARIES=$(git diff --numstat --diff-filter=ACM "origin/$BASE_REF...HEAD" | awk '$1 == "-" || $2 == "-" {print $3}')
 
           if [ -n "$BINARIES" ]; then
             echo "::error::Binary files are not allowed to be committed in PRs. Found:"
