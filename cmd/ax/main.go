@@ -1101,7 +1101,7 @@ const interruptExitWindow = time.Second
 // escalateInterrupts relays each signal from in to the returned channel, except
 // that a signal arriving within window of the previous one calls exit instead.
 // This keeps a single Ctrl-C going to the remote command while a repeated one
-// still works as an escape hatch (like ssh's own behaviour).
+// still works as an escape hatch.
 func escalateInterrupts(in <-chan os.Signal, window time.Duration, exit func()) <-chan os.Signal {
 	out := make(chan os.Signal, 1)
 	go func() {
