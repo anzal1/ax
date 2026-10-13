@@ -349,6 +349,18 @@ func TestParseSSHArgs(t *testing.T) {
 			wantCommand: []string{"python3", "main.py"},
 		},
 		{
+			name:        "later -- is kept with leading --",
+			args:        []string{"task123", "--", "git", "log", "--", "file"},
+			wantTask:    "task123",
+			wantCommand: []string{"git", "log", "--", "file"},
+		},
+		{
+			name:        "later -- is kept without leading --",
+			args:        []string{"task123", "git", "log", "--", "file"},
+			wantTask:    "task123",
+			wantCommand: []string{"git", "log", "--", "file"},
+		},
+		{
 			name:        "help after the task name goes to the remote command",
 			args:        []string{"task123", "--", "git", "--help"},
 			wantTask:    "task123",

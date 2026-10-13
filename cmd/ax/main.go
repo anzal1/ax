@@ -1004,8 +1004,8 @@ Examples:
 
 // parseSSHArgs splits the arguments of `ax ssh` into the task name and the command
 // to run, defaulting the command to /bin/sh. help reports a -h or --help given in
-// place of the task name. Arguments after the task name form the command, with or
-// without a separating "--".
+// place of the task name. Arguments after the task name form the command, passed
+// verbatim, with or without a separating "--" directly after the task name.
 func parseSSHArgs(args []string) (taskName string, command []string, help bool, err error) {
 	if len(args) == 0 || args[0] == "--" {
 		return "", nil, false, errors.New("missing task name")
@@ -1018,13 +1018,13 @@ func parseSSHArgs(args []string) (taskName string, command []string, help bool, 
 	}
 
 	taskName = args[0]
-	for i := 1; i < len(args); i++ {
-		if args[i] == "--" {
-			command = append(command, args[i+1:]...)
-			break
-		}
-		command = append(command, args[i])
+	// Only a "--" directly after the task name is the separator. Any later "--"
+	// belongs to the remote command (for example `git log -- file`).
+	rest := args[1:]
+	if len(rest) > 0 && rest[0] == "--" {
+		rest = rest[1:]
 	}
+	command = append(command, rest...)
 	if len(command) == 0 {
 		command = []string{"/bin/sh"}
 	}
